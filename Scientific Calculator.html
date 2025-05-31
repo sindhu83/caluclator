@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scientific Calculator with History</title>
+  <style>
+    body {
+      background: #f0f4f8;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+
+    .calculator {
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .display {
+      width: 320px;
+      height: 50px;
+      font-size: 22px;
+      margin-bottom: 15px;
+      text-align: right;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+      background: #e6f2ff;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      gap: 10px;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background-color: #4da6ff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #3399ff;
+    }
+
+    .equal {
+      grid-column: span 2;
+      background-color: #28a745;
+    }
+
+    .equal:hover {
+      background-color: #218838;
+    }
+
+    .clear {
+      background-color: #dc3545;
+    }
+
+    .clear:hover {
+      background-color: #c82333;
+    }
+
+    .history-box {
+      width: 340px;
+      max-height: 200px;
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      padding: 15px;
+    }
+
+    .history-box h3 {
+      margin-top: 0;
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .history-item {
+      font-size: 16px;
+      margin: 5px 0;
+      color: #444;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+
+    .clear-history-btn {
+      margin-top: 10px;
+      background: #ff6600;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .clear-history-btn:hover {
+      background: #e65c00;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculator">
+    <input type="text" class="display" id="display" readonly />
+    <div class="buttons">
+      <button onclick="append('7')">7</button>
+      <button onclick="append('8')">8</button>
+      <button onclick="append('9')">9</button>
+      <button onclick="append('/')">÷</button>
+      <button onclick="calculateTrig('sin')">sin</button>
+
+      <button onclick="append('4')">4</button>
+      <button onclick="append('5')">5</button>
+      <button onclick="append('6')">6</button>
+      <button onclick="append('*')">×</button>
+      <button onclick="calculateTrig('cos')">cos</button>
+
+      <button onclick="append('1')">1</button>
+      <button onclick="append('2')">2</button>
+      <button onclick="append('3')">3</button>
+      <button onclick="append('-')">−</button>
+      <button onclick="calculateTrig('tan')">tan</button>
+
+      <button onclick="append('0')">0</button>
+      <button onclick="append('.')">.</button>
+      <button class="equal" onclick="calculate()">=</button>
+      <button onclick="append('+')">+</button>
+      <button onclick="append('Math.PI')">π</button>
+
+      <button onclick="append('Math.sqrt(')">√</button>
+      <button onclick="append('Math.log10(')">log</button>
+      <button onclick="append('**2')">x²</button>
+      <button onclick="append('Math.E')">e</button>
+      <button class="clear" onclick="clearDisplay()">C</button>
+    </div>
+  </div>
+
+  <div class="history-box" id="historyBox">
+    <h3>History</h3>
+    <div id="historyList"></div>
+    <button class="clear-history-btn" onclick="clearHistory()">Clear History</button>
+  </div>
+
+  <script>
+    const display = document.getElementById('display');
+    const historyList = document.getElementById('historyList');
+
+    function append(value) {
+      display.value += value;
+    }
+
+    function clearDisplay() {
+      display.value = '';
+    }
+
+    function calculate() {
+      try {
+        const expression = display.value;
+        const result = eval(expression);
+        display.value = result;
+
+        // Add to history
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.textContent = `${expression} = ${result}`;
+        historyList.prepend(item);
+      } catch {
+        display.value = 'Error';
+      }
+    }
+
+    function calculateTrig(func) {
+      try {
+        const value = parseFloat(display.value);
+        let result = '';
+
+        if (isNaN(value)) {
+          display.value = 'Error';
+          return;
+        }
+
+        switch (func) {
+          case 'sin': result = Math.sin(toRadians(value)); break;
+          case 'cos': result = Math.cos(toRadians(value)); break;
+          case 'tan': result = Math.tan(toRadians(value)); break;
+        }
+
+        display.value = result;
+
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.textContent = `${func}(${value}) = ${result}`;
+        historyList.prepend(item);
+      } catch {
+        display.value = 'Error';
+      }
+    }
+
+    function toRadians(degrees) {
+      return degrees * (Math.PI / 180);
+    }
+
+    function clearHistory() {
+      historyList.innerHTML = '';
+    }
+  </script>
+
+</body>
+</html>
